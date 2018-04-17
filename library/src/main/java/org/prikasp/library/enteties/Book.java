@@ -18,7 +18,7 @@ public class Book
 {
     private final String title;
     private final int year;
-    private final List<String> authors;
+    private final List<Author> authors;
 
     /**
      * Creates Book with name, year of publishing and list of Authors
@@ -26,7 +26,7 @@ public class Book
      * @param year  Year of pusblishing
      * @param authors   List of Authors. Order is important
      */
-    public Book(String title, int year, List<String> authors) 
+    public Book(String title, int year, List<Author> authors) 
     {
         this.title = title;
         this.year = year;
@@ -43,7 +43,7 @@ public class Book
         return year;
     }
 
-    public List<String> getAuthors() 
+    public List<Author> getAuthors() 
     {
         return authors;
     }
