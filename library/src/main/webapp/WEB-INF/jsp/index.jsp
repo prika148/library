@@ -67,5 +67,7 @@
             <p><input type="text" placeholder="Год издания" id="bookYear"/></p>
             <p><input type="text" placeholder="Автор" id="Author1"/></p>
         </form>
+        <br>
+        <a href="/library/books.htm">Список всех книг</a>
     </body>
 </html>

@@ -26,6 +26,12 @@ public class LibraryController
         return "index";
     }
         
+    @RequestMapping(value = "/books.htm")
+    public String books()
+    {
+        return "books";
+    }
+    
     @RequestMapping(value = "/add_book.htm")
     public String addBook(HttpServletRequest request,  ModelMap model)
     {
