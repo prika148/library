@@ -5,8 +5,10 @@
  */
 package org.prikasp.library.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 
 /**
  *
@@ -19,5 +21,13 @@ public class LibraryController
     public String index()
     {
         return "index";
+    }
+    
+    @RequestMapping(value = "/add_book.htm")
+    public String addBook(HttpServletRequest request,  ModelMap model)
+    {
+        System.out.println(request.getParameter("json"));
+        model.addAttribute("text", "Успешно добавлено");
+        return "response";
     }
 }
