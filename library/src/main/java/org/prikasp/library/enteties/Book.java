@@ -5,7 +5,9 @@
  */
 package org.prikasp.library.enteties;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -33,6 +35,19 @@ public class Book
         this.authors = authors;
     }
 
+    /**
+     * Creates Book with name, year of publishing and list of Authors
+     * @param title Title of the book
+     * @param year  Year of pusblishing
+     * @param authors   List of Authors. Order is important
+     */
+    public Book(String title, int year) 
+    {
+        this.title = title;
+        this.year = year;
+        this.authors = new LinkedList<>();
+    }
+
     public String getTitle() 
     {
         return title;
@@ -46,5 +61,11 @@ public class Book
     public List<Author> getAuthors() 
     {
         return authors;
+    }
+
+    public List<String> getAuthorsStr() 
+    {
+        return authors.stream().map((Author elem)->{ return elem.getName();})
+                .collect(Collectors.toList());
     }
 }

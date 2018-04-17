@@ -11,6 +11,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.prikasp.library.enteties.Author;
@@ -46,6 +51,7 @@ public class SimpleDataBaseWorker
     PreparedStatement authorLookup;
     PreparedStatement authorInsert;
     PreparedStatement linkInsert;
+    PreparedStatement getAllBooks;
     static SimpleDataBaseWorker instance;
     
     private SimpleDataBaseWorker()
@@ -65,6 +71,10 @@ public class SimpleDataBaseWorker
                     "select id from library.authors where name = ?");
             authorInsert = connection.prepareStatement(
                     "insert into library.authors(name) values(?) returning id");
+            getAllBooks = connection.prepareStatement(
+                    "select tb.id, title, year, name from library.books as tb "
+                            + "inner join library.book_to_author as tl on (tb.id = tl.book_id) "
+                            + "inner join library.authors as ta on (ta.id = tl.author_id)");
             linkInsert = connection.prepareStatement(
                     "insert into library.book_to_author(book_id, author_id)"
                             + " values(?, ?)");
@@ -80,6 +90,38 @@ public class SimpleDataBaseWorker
         if(instance == null)
             instance = new SimpleDataBaseWorker();
         return instance;
+    }
+    
+    public Collection<Book> getAllBooks()
+    {
+        Map<Integer, Book> result = new HashMap<>();
+        
+        try 
+        {
+            System.out.println("1");
+            ResultSet selectResults = getAllBooks.executeQuery();
+            System.out.println("2");
+            while(selectResults.next())
+            {
+            System.out.println("3");
+                int bookId = selectResults.getInt(1);
+                if(!result.containsKey(bookId))
+                {
+            System.out.println("4");
+                    String bookTitle = selectResults.getString(2);
+                    int bookYear = selectResults.getInt(3);
+                    result.put(bookId, new Book(bookTitle, bookYear));
+                }
+            System.out.println("5");
+                String authorName = selectResults.getString(4);
+                result.get(bookId).getAuthors().add(new Author(authorName));
+            }
+        } 
+        catch (SQLException ex) 
+        {
+            //TODO: log error
+        }
+        return result.values();
     }
     
     public boolean saveBook(Book book)
@@ -228,7 +270,7 @@ public class SimpleDataBaseWorker
         {
             linkInsert.setInt(1, bookId);
             linkInsert.setInt(2, authorId);
-            authorLookup.execute();
+            linkInsert.execute();
             return true;
         } 
         catch (SQLException ex) 
