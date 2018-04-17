@@ -24,10 +24,14 @@
             <% 
                 for (Book book : SimpleDataBaseWorker.getWorker().getAllBooks()) 
                 {
+                    String href = "/library/book_details.htm?id=" + String.valueOf(book.getId());
             %>
-                <td><%out.print(book.getTitle());%></td>
+            <tr>
+                <td><a href="<%out.print(href);%>">
+                        <%out.print(book.getTitle());%></a></td>
                 <td><%out.print(book.getYear());%></td>
                 <td><%out.print(String.join("; ", book.getAuthorsStr()));%></td>
+            </tr>
             <%
                 }
             %>

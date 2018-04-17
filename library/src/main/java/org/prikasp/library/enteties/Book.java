@@ -20,6 +20,7 @@ public class Book
 {
     private final String title;
     private final int year;
+    private final int id;
     private final List<Author> authors;
 
     /**
@@ -33,6 +34,7 @@ public class Book
         this.title = title;
         this.year = year;
         this.authors = authors;
+        this.id = -1;
     }
 
     /**
@@ -41,11 +43,12 @@ public class Book
      * @param year  Year of pusblishing
      * @param authors   List of Authors. Order is important
      */
-    public Book(String title, int year) 
+    public Book(String title, int year, int id) 
     {
         this.title = title;
         this.year = year;
         this.authors = new LinkedList<>();
+        this.id = id;
     }
 
     public String getTitle() 
@@ -56,6 +59,11 @@ public class Book
     public int getYear() 
     {
         return year;
+    }
+
+    public int getId() 
+    {
+        return id;
     }
 
     public List<Author> getAuthors() 

@@ -28,7 +28,7 @@ import org.prikasp.library.enteties.Book;
 Create table library.books (id serial primary key, title text, year integer);
 Create table library.authors (id serial primary key, name text);
 Create table library.book_to_author (book_id INTEGER NOT NULL, author_id INTEGER NOT NULL,
-        CONSTRAINT "FK_book_id" FOREIGN KEY ("book_id") REFERENCES library.books ("id"),
+        CONSTRAINT "FK_book_id" FOREIGN KEY ("book_id") REFERENCES library.books ("id") ON DELETE CASCADE,
         CONSTRAINT "FK_author_id" FOREIGN KEY ("author_id") REFERENCES library.authors ("id") );
 CREATE UNIQUE INDEX "UI_book_to_author"  ON library.book_to_author USING btree ("book_id", "author_id");
 CREATE UNIQUE INDEX "UI_books"  ON library.books USING btree (title, year);
@@ -52,6 +52,9 @@ public class SimpleDataBaseWorker
     PreparedStatement authorInsert;
     PreparedStatement linkInsert;
     PreparedStatement getAllBooks;
+    PreparedStatement getBook;
+    PreparedStatement removeBook;
+    PreparedStatement updateBook;
     static SimpleDataBaseWorker instance;
     
     private SimpleDataBaseWorker()
@@ -71,10 +74,19 @@ public class SimpleDataBaseWorker
                     "select id from library.authors where name = ?");
             authorInsert = connection.prepareStatement(
                     "insert into library.authors(name) values(?) returning id");
+            removeBook = connection.prepareStatement(
+                    "delete from library.books where id = ?");
+            updateBook = connection.prepareStatement(
+                    "update library.books set title = ?, year = ? where id = ?");
             getAllBooks = connection.prepareStatement(
                     "select tb.id, title, year, name from library.books as tb "
                             + "inner join library.book_to_author as tl on (tb.id = tl.book_id) "
                             + "inner join library.authors as ta on (ta.id = tl.author_id)");
+            getBook = connection.prepareStatement(
+                    "select title, year, name from library.books as tb "
+                            + "inner join library.book_to_author as tl on (tb.id = tl.book_id) "
+                            + "inner join library.authors as ta on (ta.id = tl.author_id)"
+                            + "where tb.id = ?");
             linkInsert = connection.prepareStatement(
                     "insert into library.book_to_author(book_id, author_id)"
                             + " values(?, ?)");
@@ -98,21 +110,16 @@ public class SimpleDataBaseWorker
         
         try 
         {
-            System.out.println("1");
             ResultSet selectResults = getAllBooks.executeQuery();
-            System.out.println("2");
             while(selectResults.next())
             {
-            System.out.println("3");
                 int bookId = selectResults.getInt(1);
                 if(!result.containsKey(bookId))
                 {
-            System.out.println("4");
                     String bookTitle = selectResults.getString(2);
                     int bookYear = selectResults.getInt(3);
-                    result.put(bookId, new Book(bookTitle, bookYear));
+                    result.put(bookId, new Book(bookTitle, bookYear, bookId));
                 }
-            System.out.println("5");
                 String authorName = selectResults.getString(4);
                 result.get(bookId).getAuthors().add(new Author(authorName));
             }
@@ -122,6 +129,64 @@ public class SimpleDataBaseWorker
             //TODO: log error
         }
         return result.values();
+    }
+    
+    public Book getBook(int bookId)
+    {
+        Book result = null;
+        
+        try 
+        {
+            getBook.setInt(1, bookId);
+            ResultSet selectResults = getBook.executeQuery();
+            while(selectResults.next())
+            {
+                if(result == null)
+                {
+                    String bookTitle = selectResults.getString(1);
+                    int bookYear = selectResults.getInt(2);
+                    result = new Book(bookTitle, bookYear, bookId);
+                }
+                String authorName = selectResults.getString(3);
+                result.getAuthors().add(new Author(authorName));
+            }
+        } 
+        catch (SQLException ex) 
+        {
+            //TODO: log error
+        }
+        return result;
+    }
+    
+    public boolean removeBook(int bookId)
+    {
+        if(!beginTransaction())
+            return false;
+        if(bookId == -1)
+        {
+            rollbackTransaction();
+            return false;
+        }
+        if(!deleteBook(bookId))
+        {
+            rollbackTransaction();
+            return false;
+        }
+            
+        return commitTransaction();
+    }
+    
+    public boolean updateBook(Book book)
+    {
+        if(!beginTransaction())
+            return false;
+        if(!updateBookImpl(book))
+        {
+            rollbackTransaction();
+            return false;
+        }
+            
+        return commitTransaction();
     }
     
     public boolean saveBook(Book book)
@@ -209,6 +274,36 @@ public class SimpleDataBaseWorker
         catch (SQLException ex) 
         {
             return -1;
+        }
+    }
+    
+    private boolean deleteBook(int bookId)
+    {
+        try 
+        {
+            removeBook.setInt(1, bookId);
+            removeBook.execute();
+            return true;
+        } 
+        catch (SQLException ex) 
+        {
+            return false;
+        }
+    }
+    
+    private boolean updateBookImpl(Book book)
+    {
+        try 
+        {
+            updateBook.setString(1, book.getTitle());
+            updateBook.setInt(2, book.getYear());
+            updateBook.setInt(3, book.getId());
+            updateBook.execute();
+            return true;
+        } 
+        catch (SQLException ex) 
+        {
+            return false;
         }
     }
     

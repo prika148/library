@@ -28,6 +28,14 @@ public class GsonProccessor
         JsonObject jsonObject = new JsonParser().parse(jsonBook).getAsJsonObject();
         String title = jsonObject.get("title").getAsString();
         int year = jsonObject.get("year").getAsInt();
+        
+        //If there is id, we do not need authors' list
+        if(jsonObject.has("id"))
+        {
+            int id = jsonObject.get("id").getAsInt();
+            return new Book(title, year, id);
+        }
+        
         List<Author> authors = new LinkedList<>();
         JsonArray arr = jsonObject.get("authors").getAsJsonArray();
         for (JsonElement jsonElement : arr) 
