@@ -100,13 +100,18 @@ public class LibraryController
     {
         String clientInput = request.getParameter("json");
         String clientOut = null;
-        
+        System.out.println("1");
         Book parsed = null;
         try
         {
+        System.out.println("2");
             parsed = GsonProccessor.parseBook(clientInput);
+        System.out.println("3" + parsed);
             if(SimpleDataBaseWorker.getWorker().updateBook(parsed))
+            {
+        System.out.println("4");
                 clientOut = "";
+            }
         }
         catch (NumberFormatException ex)
         {

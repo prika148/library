@@ -11,14 +11,14 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>${title}</title>
           <script>
-                function foo() 
+                function updateBook() 
                 {
                     var aBook = new Object();
                     aBook.title = document.getElementById("bookTitle").value;
                     aBook.year = document.getElementById("bookYear").value;
                     aBook.id = ${id};
                     
-                    var jsonString = JSON.stringify(newBook);
+                    var jsonString = JSON.stringify(aBook);
                     var xhr = new XMLHttpRequest();
                     var body = 'json=' + encodeURIComponent(jsonString);
 
@@ -28,7 +28,7 @@
                     xhr.onreadystatechange = function() 
                         {
                             if (this.readyState !== 4) return;
-                            if(this.responseText !== "")
+                            if(this.responseText.length > 3)
                                 alert( this.responseText );
                             else
                                 location.reload();
