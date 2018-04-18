@@ -26,12 +26,18 @@ public class LibraryController
         return "index";
     }
         
+    /*
+     * Get list of all books
+     */
     @RequestMapping(value = "/books.htm")
     public String books()
     {
         return "books";
     }
     
+    /*
+     * Read ures POST request with JSON, parse it to book and save this book to DB
+     */
     @RequestMapping(value = "/add_book.htm")
     public String addBook(HttpServletRequest request,  ModelMap model)
     {
@@ -55,6 +61,10 @@ public class LibraryController
         return "response";
     }
     
+    /*
+    * Show details of certain book, whose id passed by GET param.
+    * If there is not such book, return index.
+    */
     @RequestMapping(value = "/book_details.htm")
     public String details(HttpServletRequest request,  ModelMap model)
     {
@@ -78,6 +88,10 @@ public class LibraryController
         return "book_details";
     }
     
+    /*
+    * Delete certain book by id, passed by GET param.
+    * Return "books" page
+    */
     @RequestMapping(value = "/drop.htm")
     public String drop(HttpServletRequest request)
     {
@@ -95,6 +109,9 @@ public class LibraryController
         return "books";
     }
     
+    /*
+    * Apply changes to a book. Takes book with id, retrieved from user by POST
+    */
     @RequestMapping(value = "/update_book.htm")
     public String updateBook(HttpServletRequest request,  ModelMap model)
     {

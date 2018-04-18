@@ -16,13 +16,20 @@ import org.prikasp.library.enteties.Author;
 import org.prikasp.library.enteties.Book;
 
 /**
- *
+ * Class for JSON parsing by GSON library.
+ * TODO: Should rewrite this class more secure.
+ * 
  * @author libre
  */
 public class GsonProccessor 
 {
     static Gson proccessor = new Gson();
     
+    /**
+     * Create book by json. There are two cases: books with id, and without
+     * @param jsonBook json to be parsed
+     * @return Book created
+     */
     public static Book parseBook(String jsonBook)
     {
         JsonObject jsonObject = new JsonParser().parse(jsonBook).getAsJsonObject();

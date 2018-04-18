@@ -57,6 +57,11 @@ public class SimpleDataBaseWorker
     PreparedStatement updateBook;
     static SimpleDataBaseWorker instance;
     
+    /**
+     * This constructor should stay the only constructor in class.
+     * 
+     * Connect to database and Create all prepared statements.
+     */
     private SimpleDataBaseWorker()
     {
         try {
@@ -90,20 +95,28 @@ public class SimpleDataBaseWorker
             linkInsert = connection.prepareStatement(
                     "insert into library.book_to_author(book_id, author_id)"
                             + " values(?, ?)");
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SimpleDataBaseWorker.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
+        } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(SimpleDataBaseWorker.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public static SimpleDataBaseWorker getWorker()
+    /**
+     * Get worker object. 
+     * If it is the first call, new SimpleDataBaseWorker would be created
+     * and stored for firther usage.
+     * @return worker instance
+     */
+    public static synchronized SimpleDataBaseWorker getWorker()
     {
         if(instance == null)
             instance = new SimpleDataBaseWorker();
         return instance;
     }
     
+    /**
+     * Get iterable collection of books with their authors.
+     * @return Collection of all books in the database
+     */
     public Collection<Book> getAllBooks()
     {
         Map<Integer, Book> result = new HashMap<>();
@@ -131,6 +144,11 @@ public class SimpleDataBaseWorker
         return result.values();
     }
     
+    /**
+     * Get certain book by its Id (or null in case of failture)
+     * @param bookId id of book to be returned
+     * @return Book with specified id or null if such not exists
+     */
     public Book getBook(int bookId)
     {
         Book result = null;
@@ -158,6 +176,13 @@ public class SimpleDataBaseWorker
         return result;
     }
     
+    /**
+     * Delete book from database by its id.
+     * 
+     * Note! this method return true if query wass callen, even if such book was not exist.
+     * @param bookId id of book to delete
+     * @return true if query was callen, false in case of errors
+     */
     public boolean removeBook(int bookId)
     {
         if(!beginTransaction())
@@ -176,6 +201,11 @@ public class SimpleDataBaseWorker
         return commitTransaction();
     }
     
+    /**
+     * Updates row in the table with id = book.getId()
+     * @param book book with id and new values of fields Title and Year
+     * @return true in case of success
+     */
     public boolean updateBook(Book book)
     {
         if(!beginTransaction())
@@ -189,6 +219,11 @@ public class SimpleDataBaseWorker
         return commitTransaction();
     }
     
+    /**
+     * Saves book to database
+     * @param book book to save
+     * @return true in case of success
+     */
     public boolean saveBook(Book book)
     {
         if(!beginTransaction())
