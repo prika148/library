@@ -6,7 +6,7 @@ CRUD приложение библиотеки.
 В качестве DAO используется наивная обертка над Postgresql JDBC.
 
 Перед запуском задайте sql окружение:
-'''
+```
 create shema if not exists library;
 Create table if not exists library.books (id serial primary key, title text, year integer);
 Create table if not exists library.authors (id serial primary key, name text);
@@ -16,7 +16,7 @@ Create table if not exists library.book_to_author (book_id INTEGER NOT NULL, aut
 CREATE UNIQUE INDEX if not exists "UI_book_to_author"  ON library.book_to_author USING btree ("book_id", "author_id");
 CREATE UNIQUE INDEX if not exists "UI_books"  ON library.books USING btree (title, year);
 CREATE UNIQUE INDEX if not exists "UI_authors"  ON library.authors USING btree (name);
-'''
+```
 
 TODO:
 - Список авторов (делается аналогично списку книг) и детали автора
